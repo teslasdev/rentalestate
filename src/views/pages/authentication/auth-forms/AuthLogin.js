@@ -86,7 +86,7 @@ const FirebaseLogin = ({ ...others }) => {
                 localStorage.setItem('token', response.data.token);
                 localStorage.setItem('user', JSON.stringify(response.data.user));
                 setTimeout(() => {
-                  navigate('/dashboard/app');
+                  window.location.href='/dashboard/app'
                 }, 500);
               } else {
                 toast.error(response.response.data.error);

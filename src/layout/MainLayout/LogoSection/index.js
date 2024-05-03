@@ -15,7 +15,7 @@ const LogoSection = () => {
   const dispatch = useDispatch();
   return (
     <ButtonBase disableRipple onClick={() => dispatch({ type: MENU_OPEN, id: defaultId })} component={Link} to={config.defaultPath}>
-      <Box component="img" src="./logorealestate.png" sx={{ width: 170 }}></Box>
+      <Box component="img" src={require('./logorealestate.png')} sx={{ width: 170 }}></Box>
     </ButtonBase>
   );
 };
