@@ -93,7 +93,15 @@ const Index = () => {
           </Button>
         );
       }
-    }
+    },
+    {
+      field: 'Date',
+      headerName: 'Date',
+      flex: 1,
+      renderCell: (params) => {
+        return <Typography style={{ color: 'black' }}>{moment(params?.row?.start_time).format('h:mm A DD-MM-YYYY')}</Typography>
+      }
+    },
   ];
 
   return (
