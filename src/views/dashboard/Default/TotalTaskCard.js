@@ -70,7 +70,7 @@ const TotalTaskCard = ({ isLoading, taskData }) => {
               <Grid item>
                 <Grid container alignItems="center" justifyContent="center">
                   <Grid item>
-                    <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>{taskData?.length}</Typography>
+                    <Typography sx={{ fontSize: '2.125rem', fontWeight: 500, mr: 1, mt: 1.75, mb: 0.75 }}>{taskData ? taskData?.length : 0}</Typography>
                   </Grid>
                   <Grid item>
                     <Avatar
