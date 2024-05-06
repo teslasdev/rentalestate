@@ -1,5 +1,5 @@
 export const constant = {
-  baseUrl: '/'
+  baseUrl: process.env.REACT_APP_BASE_URL
 };
 
 console.log(constant);

@@ -22,6 +22,7 @@ import DeleteLead from './DeleteLead';
 import EditLead from './EditLead';
 import SendMailDialog from './Components/LeadActivityDialogs/sendMailDialog';
 import CallDialog from './Components/LeadActivityDialogs/CallDialog';
+import moment from 'moment';
 
 // ----------------------------------------------------------------------
 
@@ -143,12 +144,74 @@ const Lead = () => {
     }
   };
 
+  const [callData, setCallData] = useState([]);
+  const [filterLead, setFilterLead] = useState([]);
+  const fetchCall = async () => {
+    try {
+      const res = await getApi('api/llm//llmleadCalls');
+      setCallData(res.data.result);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const filterCallsByAgentSentiment = () => {
+    // Filter calls with positive agent sentiment
+    const filteredCalls = callData.filter((call) => {
+      if (call.call_analysis && call.call_analysis.agent_sentiment === 'Positive') {
+        return true;
+      }
+      return false;
+    });
+
+    // Define key mappings
+    const keyMap = {
+      caller_number: 'leadPhoneNumber',
+      caller_name: 'leadName',
+      caller_email: 'leadEmail',
+      start_time: 'updatedDate'
+    };
+
+    // Replace all keys in each object of the array
+    const newArrayfiltered = filteredCalls.map((obj, index) => replaceAllKeys(obj, keyMap , index));
+    setFilterLead(newArrayfiltered);
+  };
+
+  function replaceAllKeys(obj, keyMap , index) {
+    const newObj = {};
+    Object.keys(obj).forEach((oldKey) => {
+      if (oldKey in keyMap) {
+        newObj[keyMap[oldKey]] = obj[oldKey];
+      } else {
+        newObj[oldKey] = obj[oldKey];
+      }
+    });
+    return newObj;
+  }
+
   useEffect(() => {
+    fetchCall();
     fetchLeadData();
   }, [openAdd, openEdit, openDelete]);
+  useEffect(() => {
+    filterCallsByAgentSentiment();
+  }, [callData]);
 
   //---------------------
   let count = 0;
+  const [newData, setNewData] = useState([]);
+  useEffect(() => {
+    updateData();
+  }, [filterLead]);
+  const updateData = () => {
+    console.log(filterLead)
+    const combinedArray = filterLead.concat(leadData);
+    // Sort the combined array by updatedDate in ascending order
+    combinedArray.sort((a, b) => new Date(a.updatedDate) - new Date(b.updatedDate));
+    setNewData(combinedArray);
+  };
+
+  console.log('newData', newData);
+  // Combine the arrays
   const columns = [
     {
       field: 'id',
@@ -165,46 +228,10 @@ const Lead = () => {
       cellClassName: 'name-column--cell name-column--cell--capitalize',
       renderCell: (params) => {
         const handleFirstNameClick = () => {
-          navigate(`/dashboard/lead/view/${params?.row._id}`);
+          navigate(`/dashboard/lead/view/${params?.row._id ? params?.row._id : params?.row.call_id }`);
         };
 
-        return <Box onClick={handleFirstNameClick}>{params?.value}</Box>;
-      }
-    },
-    {
-      field: 'leadStatus',
-      headerName: 'Status',
-      flex: 1,
-      cellClassName: `name-column--cell--capitalize`,
-      renderCell: (params) => {
-        return (
-          <Box
-            sx={
-              params?.value?.toLowerCase() == 'active'
-                ? {
-                    backgroundColor: '#01B574',
-                    color: 'white',
-                    padding: '4px',
-                    borderRadius: '5px'
-                  }
-                : params?.value?.toLowerCase() == 'pending'
-                ? {
-                    backgroundColor: '#ECC94B',
-                    color: 'white',
-                    padding: '4px',
-                    borderRadius: '5px'
-                  }
-                : {
-                    backgroundColor: '#eb7b74',
-                    color: 'white',
-                    padding: '4px',
-                    borderRadius: '5px'
-                  }
-            }
-          >
-            {params?.value}
-          </Box>
-        );
+        return <Box onClick={handleFirstNameClick}>{params?.value ? params?.value : 'No Name'}</Box>;
       }
     },
     {
@@ -216,37 +243,6 @@ const Lead = () => {
       field: 'leadPhoneNumber',
       headerName: 'Phone Number',
       flex: 1
-    },
-    {
-      field: 'leadOwner',
-      headerName: 'Owner',
-      flex: 1
-    },
-    {
-      field: 'leadScore',
-      headerName: 'Score',
-      flex: 1,
-      renderCell: (params) => {
-        return (
-          <Box
-            sx={
-              params?.value >= 80
-                ? {
-                    color: '#01B574'
-                  }
-                : params?.value >= 50 && params?.value < 80
-                ? {
-                    color: '#01B574'
-                  }
-                : {
-                    color: '#eb7b74'
-                  }
-            }
-          >
-            {params?.value}
-          </Box>
-        );
-      }
     },
     {
       field: 'action',
@@ -302,7 +298,15 @@ const Lead = () => {
           </>
         );
       }
-    }
+    },
+    {
+      field: 'Date',
+      headerName: 'Date',
+      flex: 1,
+      renderCell: (params) => {
+        return <Typography style={{ color: 'black' }}>{moment(params?.row?.updatedDate).format('h:mm A DD-MM-YYYY')}</Typography>
+      }
+    },
   ];
 
   return (
@@ -323,18 +327,24 @@ const Lead = () => {
         </Stack>
         <TableStyle>
           <Box width="100%">
-            <Card style={{ height: '600px', paddingTop: '15px' }}>
-              {leadData && (
+            <Card style={{ height: '600px', paddingTop: '10px' }}>
+              {newData && (
                 <>
                   <Typography variant="h4" sx={{ margin: '2px 15px' }}>
-                    Leads ( {leadData?.length} )
+                    Leads ( {newData?.length} )
                   </Typography>
                   <DataGrid
-                    rows={leadData}
+                    rows={newData}
                     columns={columns}
                     checkboxSelection
-                    getRowId={(row) => row?._id}
+                    getRowId={(row) => row?._id ? row?._id : row?.call_id}
+                    initialState={{
+                      pagination: {
+                        paginationModel: { page: 0, pageSize: 10 }
+                      }
+                    }}
                     slots={{ toolbar: GridToolbar }}
+                    pageSizeOptions={[5, 20]}
                     slotProps={{ toolbar: { showQuickFilter: true } }}
                   />
                 </>

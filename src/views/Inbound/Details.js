@@ -39,7 +39,6 @@ function Details() {
     fetchInboundDetails();
   }, []);
 
-  const messages = callData?.transcript && callData?.transcript.split('\n');
 
   return (
     <Grid item xs={12} md={5}>
@@ -71,6 +70,11 @@ function Details() {
                 <Box display={'flex'} gap={1} py={2}>
                   <Typography variant="h5">Call Id:</Typography>
                   <Typography style={{ color: 'black' }}>{callData?.call_id ? callData?.call_id : 'N/A'}</Typography>
+                </Box>
+
+                <Box display={'flex'} gap={1} py={2}>
+                  <Typography variant="h5">Phone Number:</Typography>
+                  <Typography style={{ color: 'black' }}>{callData?.caller_number}</Typography>
                 </Box>
 
                 <Box display={'flex'} alignItems={'center'} gap={1} py={2}>
@@ -144,7 +148,12 @@ function Details() {
 
                 <Box display={'flex'} flexDirection={'column'} gap={1} py={2}>
                   <Typography variant="h5">Transcript:</Typography>
-                  <Typography style={{ color: 'black' }}>{callData?.transcript && callData?.transcript.split('\n')}</Typography>
+                  {callData.transcript && callData?.transcript.map((item , index) => {
+                    return (
+                      <Typography key={index} style={{ color: 'black' }}>{item.speaker} : {item.message}</Typography>
+                    )
+                  })}
+                 
                 </Box>
 
                 <Box display={'block'} gap={1} py={2}>
@@ -282,45 +291,6 @@ function Details() {
               </Box>
             </Box>
           </Box>
-
-          {/* <Box display={'flex'} alignItems={'center'} mt={3} gap={2}>
-              <Box
-                width={'50px'}
-                height={'50px'}
-                borderRadius={4}
-                display={'flex'}
-                justifyContent={'center'}
-                alignItems={'center'}
-                style={{ background: '#ede7f6', color: '#5e35b1' }}
-              >
-                <IconTextPlus />
-              </Box>
-              <Typography fontSize={'18px'} color={'#5e35b1'}>
-                Summary
-              </Typography>
-            </Box>
-            <Typography fontSize={'16px'} my={5}>
-              Lorem fsjddfkfsunsfkndjvakslgfvabksdkuwekfukjcsksjkf
-            </Typography>
-            <Box display={'flex'} alignItems={'center'} mt={3} gap={2}>
-              <Box
-                width={'50px'}
-                height={'50px'}
-                borderRadius={4}
-                display={'flex'}
-                justifyContent={'center'}
-                alignItems={'center'}
-                style={{ background: '#ede7f6', color: '#5e35b1' }}
-              >
-                <IconActivityHeartbeat />
-              </Box>
-              <Typography fontSize={'18px'} color={'#5e35b1'}>
-                Transcript
-              </Typography>
-            </Box>
-            <Typography fontSize={'16px'} my={5}>
-              Lorem fsjddfkfsunsfkndjvakslgfvabksdkuwekfukjcsksjkf
-            </Typography> */}
         </CardContent>
       </Card>
     </Grid>

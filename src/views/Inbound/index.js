@@ -51,22 +51,30 @@ const Index = () => {
       }
     },
     {
-      field: 'Call Status',
-      headerName: 'Call Status',
-      width: 160,
+      field: 'Caller Number',
+      headerName: 'Caller Number',
+      flex: 1,
+      renderCell: (params) => {
+        return <Box>{params?.row?.caller_number}</Box>;
+      }
+    },
+    {
+      field: 'Lead',
+      headerName: 'Lead',
+      flex: 1,
       renderCell: (params) => {
         return (
           <>
             <>
-              {params?.row?.call_status === 'ended' ? (
+              {params?.row?.call_analysis?.agent_sentiment == 'Positive' ? (
                 <Box display={'flex'} alignItems={'center'} gap={1}>
                   <Box width="10px" borderRadius={'100%'} height="10px" style={{ background: '#90EE90', color: '#5e35b1' }}></Box>
-                  <Typography style={{ color: '#90EE90' }}>Ended</Typography>
+                  <Typography style={{ color: '#90EE90' }}>Lead</Typography>
                 </Box>
               ) : (
                 <Box display={'flex'} alignItems={'center'} gap={1}>
                   <Box width="10px" borderRadius={'100%'} height="10px" style={{ background: '#850101', color: '#5e35b1' }}></Box>
-                  <Typography style={{ color: '#850101' }}>Error</Typography>
+                  <Typography style={{ color: '#850101' }}>No Lead</Typography>
                 </Box>
               )}
             </>
