@@ -11,7 +11,8 @@ import {
   IconNotebook,
   IconPhoneCheck,
   IconUsers,
-  IconPhoneIncoming
+  IconPhoneIncoming,
+  IconPhoneOutgoing
 } from '@tabler/icons';
 
 // constant
@@ -27,7 +28,8 @@ const icons = {
   IconNotebook,
   IconPhoneCheck,
   IconUsers,
-  IconPhoneIncoming
+  IconPhoneIncoming,
+  IconPhoneOutgoing
 };
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
@@ -139,6 +141,14 @@ const dashboard = {
       type: 'item',
       url: '/dashboard/inbound-calls',
       icon: icons.IconPhoneIncoming,
+      breadcrumbs: false
+    },
+    {
+      id: '12',
+      title: 'Outbound Calls',
+      type: 'item',
+      url: '/dashboard/outbound',
+      icon: icons.IconPhoneOutgoing,
       breadcrumbs: false
     }
   ]
