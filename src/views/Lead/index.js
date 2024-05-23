@@ -18,7 +18,7 @@ import { getApi } from 'views/services/api';
 import IconButton from '@mui/material/IconButton';
 import { useEffect } from 'react';
 import AddLead from './AddLead.js';
-import DeleteLead from './DeleteLead';
+import DeleteLead from './UploadCsvLead';
 import EditLead from './EditLead';
 import SendMailDialog from './Components/LeadActivityDialogs/sendMailDialog';
 import CallDialog from './Components/LeadActivityDialogs/CallDialog';
@@ -78,71 +78,11 @@ const Lead = () => {
   const user = JSON.parse(localStorage.getItem('user'));
 
   //-------------------------------------------
-  const open = anchorEl;
-  const handleClick = (id) => {
-    // console.log('event.currentTarget', event.currentTarget);
-    setAnchorEl(id);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleDropdownClick = (params) => {
-    // console.log(params?);
-    alert(params?.id);
-  };
-
-  // functions for opening the dialog boxes ---------------------------------
-
-  // function for  mail dialog/////////////////////////////////////
-  const handleOpenEmail = (id) => {
-    setLeadId(id);
-    setOpenSendMail(true);
-  };
-  const handleCloseEmail = () => setOpenSendMail(false);
-
-  // function for  mail dialog/////////////////////////////////////
-  const handleOpenCall = (id) => {
-    setLeadId(id);
-    setOpenCall(true);
-  };
-  const handleCloseCall = () => setOpenCall(false);
-  // function for  delete dialog/////////////////////////////////////
-  const handleOpenDeleteLead = (id) => {
-    console.log(id);
-    setLeadId(id);
-    setOpenDelete(true);
-  };
-  const handleCloseDeleteLead = () => setOpenDelete(false);
-
-  // function for add dialog/////////////////////////////////////
-
-  const handleOpenAdd = () => setOpenAdd(true);
-  const handleCloseAdd = () => setOpenAdd(false);
-
-  const handleOpenEditlead = (data) => {
-    setPropsData(data);
-    setOpenEdit(true);
-    console.log(openEdit);
-  };
-  const handleCloseEditlead = () => setOpenEdit(false);
-  //-----------------------------------------------
-  const handleOpenview = (id) => {
-    navigate(`/dashboard/lead/view/${id}`);
-  };
-
   // ----------------------------------------------------------------------
 
   // function for fetching all the leads data from the db
 
-  const fetchLeadData = async () => {
-    try {
-      const response = await getApi(user.role === 'admin' ? 'api/lead/viewallleads' : `api/lead/viewuserleads/${user._id}`);
-      setLeadData(response?.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  
 
   const [callData, setCallData] = useState([]);
   const [filterLead, setFilterLead] = useState([]);
@@ -165,10 +105,10 @@ const Lead = () => {
 
     // Define key mappings
     const keyMap = {
-      caller_number: 'leadPhoneNumber',
-      caller_name: 'leadName',
-      caller_email: 'leadEmail',
-      start_time: 'updatedDate'
+      caller_number: 'phoneNumber',
+      caller_name: 'name',
+      caller_email: 'email',
+      start_time: 'start_date'
     };
 
     // Replace all keys in each object of the array
@@ -190,8 +130,7 @@ const Lead = () => {
 
   useEffect(() => {
     fetchCall();
-    fetchLeadData();
-  }, [openAdd, openEdit, openDelete]);
+  }, []);
   useEffect(() => {
     filterCallsByAgentSentiment();
   }, [callData]);
@@ -203,11 +142,8 @@ const Lead = () => {
     updateData();
   }, [filterLead]);
   const updateData = () => {
-    console.log(filterLead)
-    const combinedArray = filterLead.concat(leadData);
-    // Sort the combined array by updatedDate in ascending order
-    combinedArray.sort((a, b) => new Date(a.updatedDate) - new Date(b.updatedDate));
-    setNewData(combinedArray);
+    filterLead.sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
+    setNewData(filterLead);
   };
 
   console.log('newData', newData);
@@ -222,108 +158,71 @@ const Lead = () => {
       }
     },
     {
-      field: 'leadName',
+      field: 'name',
       headerName: 'Name',
       flex: 1,
       cellClassName: 'name-column--cell name-column--cell--capitalize',
       renderCell: (params) => {
         const handleFirstNameClick = () => {
-          navigate(`/dashboard/lead/view/${params?.row._id ? params?.row._id : params?.row.call_id }`);
+          navigate(`/dashboard/inbound-calls/view/${params?.row._id ? params?.row._id : params?.row.call_id }`);
         };
 
         return <Box onClick={handleFirstNameClick}>{params?.value ? params?.value : 'No Name'}</Box>;
       }
     },
     {
-      field: 'leadEmail',
+      field: 'email',
       headerName: 'Email',
-      flex: 1
-    },
-    {
-      field: 'leadPhoneNumber',
-      headerName: 'Phone Number',
-      flex: 1
-    },
-    {
-      field: 'action',
-      headerName: 'Action',
       flex: 1,
-      // eslint-disable-next-line arrow-body-style
       renderCell: (params) => {
-        return (
-          <>
-            <div>
-              <IconButton
-                aria-label="more"
-                id="long-button"
-                aria-controls={open ? 'long-menu' : undefined}
-                aria-expanded={open ? 'true' : undefined}
-                aria-haspopup="true"
-                onClick={() => handleClick(params?.row._id)}
-              >
-                <MoreVertIcon />
-              </IconButton>
-
-              <StyledMenu
-                id="demo-customized-menu"
-                MenuListProps={{
-                  'aria-labelledby': 'demo-customized-button'
-                }}
-                anchorEl={anchorEl === params?.row._id}
-                open={open === params?.row._id}
-                onClose={handleClose}
-              >
-                <MenuItem onClick={() => handleOpenEditlead(params?.row)} disableRipple>
-                  <EditIcon style={{ marginRight: '8px' }} />
-                  Edit
-                </MenuItem>
-                <MenuItem onClick={() => handleOpenCall(params?.row._id)} disableRipple>
-                  <CallIcon style={{ marginRight: '8px' }} />
-                  Create Call
-                </MenuItem>
-                <MenuItem onClick={() => handleOpenEmail(params?.row._id)} disableRipple>
-                  <SendIcon style={{ marginRight: '8px' }} />
-                  Send Email
-                </MenuItem>
-                <MenuItem onClick={() => handleOpenview(params?.row._id)} disableRipple>
-                  <VisibilityIcon style={{ marginRight: '8px', color: 'green' }} />
-                  View
-                </MenuItem>
-                <MenuItem onClick={() => handleOpenDeleteLead(params?.row._id)} sx={{ color: 'red' }} disableRipple>
-                  <DeleteIcon style={{ marginRight: '8px', color: 'red' }} />
-                  Delete
-                </MenuItem>
-              </StyledMenu>
-            </div>
-          </>
-        );
+       
+        return <Box>{params?.value ? params?.value : 'N/A'}</Box>;
       }
     },
     {
-      field: 'Date',
+      field: 'phoneNumber',
+      headerName: 'Phone Number',
+      flex: 1,
+      renderCell: (params) => {
+       
+        return <Box>{params?.value ? params?.value : 'N/A'}</Box>;
+      }
+    },
+    {
+      field: 'start_date',
       headerName: 'Date',
       flex: 1,
       renderCell: (params) => {
-        return <Typography style={{ color: 'black' }}>{moment(params?.row?.updatedDate).format('h:mm A DD-MM-YYYY')}</Typography>
+        return <Typography style={{ color: 'black' }}>{moment(params?.row?.start_date).format('h:mm A DD-MM-YYYY')}</Typography>
+      }
+    },
+    {
+      field: 'Call',
+      headerName: 'Call',
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <Button
+            padding={1}
+            borderRadius={1}
+            onClick={""}
+            display={'flex'}
+            justifyContent={'center'}
+            alignItems={'center'}
+            style={{ background: '#ede7f6', color: '#5e35b1' }}
+          >
+            Create Call
+          </Button>
+        );
       }
     },
   ];
 
   return (
     <>
-      <AddLead open={openAdd} handleClose={handleCloseAdd} />
-      <DeleteLead open={openDelete} handleClose={handleCloseDeleteLead} id={leadId} />
-      <EditLead open={openEdit} handleClose={handleCloseEditlead} data={propsData} />
-      <SendMailDialog open={openSendMail} onClose={handleCloseEmail} id={leadId} />
-      <CallDialog open={openCall} onClose={handleCloseCall} id={leadId} />
       <Container>
         <Stack direction="row" alignItems="center" mb={5} justifyContent={'space-between'}>
           <Typography variant="h4">Lead-Management</Typography>
-          <Stack direction="row" alignItems="center" justifyContent={'flex-end'} spacing={2}>
-            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
-              New Lead
-            </Button>
-          </Stack>
         </Stack>
         <TableStyle>
           <Box width="100%">

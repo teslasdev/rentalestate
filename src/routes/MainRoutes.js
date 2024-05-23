@@ -18,6 +18,7 @@ import AdminProfile from 'views/AdminProfile/AdminProfile';
 import Grid from '@mui/system/Unstable_Grid/Grid';
 import AddEmployee from 'views/AddEmployee/AddEmployee';
 import Details from 'views/Inbound/Details';
+import DetailsOutbound from 'views/Outbound/Details';
 
 
 // dashboard routing
@@ -181,6 +182,15 @@ const MainRoutes = {
         {
           path: '/dashboard/inbound-calls/view/:id',
           element: <Details />
+        }
+      ]
+    },
+    {
+      path: 'dashboard',
+      children: [
+        {
+          path: '/dashboard/outbound-calls/view/:id',
+          element: <DetailsOutbound />
         }
       ]
     },

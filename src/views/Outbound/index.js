@@ -1,28 +1,16 @@
 import { useNavigate } from 'react-router-dom';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import EditIcon from '@mui/icons-material/Edit';
 import Iconify from '../../ui-component/iconify';
 import TableStyle from '../../ui-component/TableStyle';
 import { useState } from 'react';
 import { Stack, Button, Container, Typography, Box, Card } from '@mui/material';
-import CallIcon from '@mui/icons-material/Call';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import DeleteIcon from '@mui/icons-material/Delete';
 import * as React from 'react';
 import { styled, alpha } from '@mui/material/styles';
-import SendIcon from '@mui/icons-material/Send';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import { getApi } from 'views/services/api';
-import IconButton from '@mui/material/IconButton';
 import { useEffect } from 'react';
 import AddLead from './AddLead.js';
-import DeleteLead from './DeleteLead';
-import EditLead from './EditLead';
-import SendMailDialog from './Components/LeadActivityDialogs/sendMailDialog';
-import CallDialog from './Components/LeadActivityDialogs/CallDialog';
-import moment from 'moment';
+import UploadCsvLead from 'views/Lead/UploadCsvLead';
 
 // ----------------------------------------------------------------------
 
@@ -68,13 +56,9 @@ const Lead = () => {
   const navigate = useNavigate();
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
-  const [openDelete, setOpenDelete] = useState(false);
+  const [OpenUploadCsv, setOpenUploadCsv] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [openSendMail, setOpenSendMail] = useState(false);
-  const [openCall, setOpenCall] = useState(false);
   const [OutboundData, setOutbound] = useState([]);
-  const [propsData, setPropsData] = useState([]);
-  const [leadId, setLeadId] = useState(null);
   const user = JSON.parse(localStorage.getItem('user'));
 
   //-------------------------------------------
@@ -108,12 +92,10 @@ const Lead = () => {
   };
   const handleCloseCall = () => setOpenCall(false);
   // function for  delete dialog/////////////////////////////////////
-  const handleOpenDeleteLead = (id) => {
-    console.log(id);
-    setLeadId(id);
-    setOpenDelete(true);
+  const handleOpenUploadCsv = () => {
+    setOpenUploadCsv(true);
   };
-  const handleCloseDeleteLead = () => setOpenDelete(false);
+  const handleCloseUploadCsv = () => setOpenUploadCsv(false);
 
   // function for add dialog/////////////////////////////////////
 
@@ -137,13 +119,18 @@ const Lead = () => {
 
   const fetchLeadData = async () => {
     try {
-      const response = await getApi(user.role === 'admin' ? 'api/lead/viewallleads' : `api/lead/viewuserleads/${user._id}`);
-      setOutbound(response?.data);
+      const response = await getApi(`api/phoneCall/getUploadedLead`);
+      setOutbound(response?.data?.leads);
+      console.log(response.data)
     } catch (error) {
       console.log(error);
     }
   };
 
+  useEffect(() => {
+    fetchLeadData()
+  },[])
+  let count = 0
   const columns = [
     {
       field: 'id',
@@ -154,7 +141,7 @@ const Lead = () => {
       }
     },
     {
-      field: 'leadName',
+      field: 'name',
       headerName: 'Name',
       flex: 1,
       cellClassName: 'name-column--cell name-column--cell--capitalize',
@@ -167,75 +154,40 @@ const Lead = () => {
       }
     },
     {
-      field: 'leadEmail',
+      field: 'email',
       headerName: 'Email',
       flex: 1
     },
     {
-      field: 'leadPhoneNumber',
+      field: 'phoneNumber',
       headerName: 'Phone Number',
       flex: 1
     },
+    // {
+    //   field: 'Date',
+    //   headerName: 'Date',
+    //   flex: 1,
+    //   renderCell: (params) => {
+    //     return <Typography style={{ color: 'black' }}>{moment(params?.row?.updatedDate).format('h:mm A DD-MM-YYYY')}</Typography>
+    //   }
+    // },
     {
-      field: 'Date',
-      headerName: 'Date',
+      field: 'Status',
+      headerName: 'Status',
       flex: 1,
-      renderCell: (params) => {
-        return <Typography style={{ color: 'black' }}>{moment(params?.row?.updatedDate).format('h:mm A DD-MM-YYYY')}</Typography>
-      }
-    },
-    {
-      field: 'action',
-      headerName: 'Action',
-      flex: 1,
-      // eslint-disable-next-line arrow-body-style
       renderCell: (params) => {
         return (
-          <>
-            <div>
-              <IconButton
-                aria-label="more"
-                id="long-button"
-                aria-controls={open ? 'long-menu' : undefined}
-                aria-expanded={open ? 'true' : undefined}
-                aria-haspopup="true"
-                onClick={() => handleClick(params?.row._id)}
-              >
-                <MoreVertIcon />
-              </IconButton>
-
-              <StyledMenu
-                id="demo-customized-menu"
-                MenuListProps={{
-                  'aria-labelledby': 'demo-customized-button'
-                }}
-                anchorEl={anchorEl === params?.row._id}
-                open={open === params?.row._id}
-                onClose={handleClose}
-              >
-                <MenuItem onClick={() => handleOpenEditlead(params?.row)} disableRipple>
-                  <EditIcon style={{ marginRight: '8px' }} />
-                  Edit
-                </MenuItem>
-                <MenuItem onClick={() => handleOpenCall(params?.row._id)} disableRipple>
-                  <CallIcon style={{ marginRight: '8px' }} />
-                  Create Call
-                </MenuItem>
-                <MenuItem onClick={() => handleOpenEmail(params?.row._id)} disableRipple>
-                  <SendIcon style={{ marginRight: '8px' }} />
-                  Send Email
-                </MenuItem>
-                <MenuItem onClick={() => handleOpenview(params?.row._id)} disableRipple>
-                  <VisibilityIcon style={{ marginRight: '8px', color: 'green' }} />
-                  View
-                </MenuItem>
-                <MenuItem onClick={() => handleOpenDeleteLead(params?.row._id)} sx={{ color: 'red' }} disableRipple>
-                  <DeleteIcon style={{ marginRight: '8px', color: 'red' }} />
-                  Delete
-                </MenuItem>
-              </StyledMenu>
-            </div>
-          </>
+          <Button
+            padding={1}
+            borderRadius={1}
+            onClick={() => navigate(`/dashboard/outbound-calls/view/${params.row._id}`)}
+            display={'flex'}
+            justifyContent={'center'}
+            alignItems={'center'}
+            style={{ background: '#ede7f6', color: '#5e35b1' }}
+          >
+            View Status
+           </Button>
         );
       }
     },
@@ -244,10 +196,7 @@ const Lead = () => {
   return (
     <>
       <AddLead open={openAdd} handleClose={handleCloseAdd} />
-      <DeleteLead open={openDelete} handleClose={handleCloseDeleteLead} id={leadId} />
-      <EditLead open={openEdit} handleClose={handleCloseEditlead} data={propsData} />
-      <SendMailDialog open={openSendMail} onClose={handleCloseEmail} id={leadId} />
-      <CallDialog open={openCall} onClose={handleCloseCall} id={leadId} />
+      <UploadCsvLead open={OpenUploadCsv} handleClose={handleCloseUploadCsv}/>
       <Container>
         <Stack direction="row" alignItems="center" mb={5} justifyContent={'space-between'}>
           <Typography variant="h4">Outbound-Management</Typography>
@@ -255,7 +204,7 @@ const Lead = () => {
             <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
               New Outbound
             </Button>
-            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
+            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenUploadCsv}>
               Upload Csv
             </Button>
           </Stack>

@@ -20,7 +20,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import AddIcon from '@mui/icons-material/Add';
 import AddLead from '../AddLead';
-import DeleteLead from '../DeleteLead';
+import DeleteLead from '../UploadCsvLead';
 import { useNavigate, useParams } from 'react-router';
 import { useEffect } from 'react';
 import moment from 'moment';
@@ -46,7 +46,7 @@ export default function LeadDashboard() {
   const [documentData, setDocumentData] = useState([]);
   const user = JSON.parse(localStorage.getItem('user'));
 
-  const handleChange = (event: React.SyntheticEvent, newValue) => {
+  const handleChange = (newValue) => {
     setValue(newValue);
   };
 

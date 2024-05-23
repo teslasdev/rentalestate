@@ -44,6 +44,7 @@ const AddLead = (props) => {
   };
   const formik = useFormik({
     initialValues,
+    validationSchema: leadSchema,
     onSubmit: async (values) => {
       console.log('hey');
       AddData(values);

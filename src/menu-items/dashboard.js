@@ -144,10 +144,10 @@ const dashboard = {
       breadcrumbs: false
     },
     {
-      id: '12',
+      id: '13',
       title: 'Outbound Calls',
       type: 'item',
-      url: '/dashboard/outbound',
+      url: '/dashboard/outbounds',
       icon: icons.IconPhoneOutgoing,
       breadcrumbs: false
     }
