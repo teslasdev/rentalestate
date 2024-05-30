@@ -195,27 +195,7 @@ const Lead = () => {
       renderCell: (params) => {
         return <Typography style={{ color: 'black' }}>{moment(params?.row?.start_date).format('h:mm A DD-MM-YYYY')}</Typography>
       }
-    },
-    {
-      field: 'Call',
-      headerName: 'Call',
-      flex: 1,
-      renderCell: (params) => {
-        return (
-          <Button
-            padding={1}
-            borderRadius={1}
-            onClick={""}
-            display={'flex'}
-            justifyContent={'center'}
-            alignItems={'center'}
-            style={{ background: '#ede7f6', color: '#5e35b1' }}
-          >
-            Create Call
-          </Button>
-        );
-      }
-    },
+    }
   ];
 
   return (

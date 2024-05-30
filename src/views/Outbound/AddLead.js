@@ -22,9 +22,9 @@ const AddLead = (props) => {
 
   const initialValues = {
     // Lead Information:
-    leadName: '',
-    leadEmail: '',
-    leadPhoneNumber: ''
+    name: '',
+    email: '',
+    phoneNumber: ''
   };
 
   const AddData = async (values) => {
@@ -78,46 +78,46 @@ const AddLead = (props) => {
                 <Grid item xs={12} sm={4} md={6}>
                   <FormLabel>Lead Name</FormLabel>
                   <TextField
-                    id="leadName"
-                    name="leadName"
+                    id="name"
+                    name="name"
                     label=""
                     size="small"
                     fullWidth
                     placeholder="Enter Name"
                     value={formik.values.leadName}
                     onChange={formik.handleChange}
-                    error={formik.touched.leadName && Boolean(formik.errors.leadName)}
-                    helperText={formik.touched.leadName && formik.errors.leadName}
+                    error={formik.touched.name && Boolean(formik.errors.name)}
+                    helperText={formik.touched.name && formik.errors.name}
                   />
                 </Grid>
                 <Grid item xs={12} sm={4} md={6}>
                   <FormLabel>Lead Phone Number</FormLabel>
                   <TextField
-                    id="leadPhoneNumber"
-                    name="leadPhoneNumber"
+                    id="phoneNumber"
+                    name="phoneNumber"
                     type="number"
                     size="small"
                     fullWidth
                     placeholder="Enter Number"
-                    value={formik.values.leadPhoneNumber}
+                    value={formik.values.phoneNumber}
                     onChange={formik.handleChange}
-                    error={formik.touched.leadPhoneNumber && Boolean(formik.errors.leadPhoneNumber)}
-                    helperText={formik.touched.leadPhoneNumber && formik.errors.leadPhoneNumber}
+                    error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
+                    helperText={formik.touched.phoneNumber && formik.errors.phoneNumber}
                   />
                 </Grid>
                 <Grid item xs={12} sm={12} md={12}>
                   <FormLabel>Lead Email</FormLabel>
                   <TextField
-                    id="leadEmail"
-                    name="leadEmail"
+                    id="email"
+                    name="email"
                     label=""
                     size="small"
                     fullWidth
                     placeholder="Enter Email"
-                    value={formik.values.leadEmail}
+                    value={formik.values.email}
                     onChange={formik.handleChange}
-                    error={formik.touched.leadEmail && Boolean(formik.errors.leadEmail)}
-                    helperText={formik.touched.leadEmail && formik.errors.leadEmail}
+                    error={formik.touched.email && Boolean(formik.errors.email)}
+                    helperText={formik.touched.email && formik.errors.email}
                   />
                 </Grid>
               </Grid>

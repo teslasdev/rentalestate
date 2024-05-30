@@ -11,6 +11,7 @@ import { getApi } from 'views/services/api';
 import { useEffect } from 'react';
 import AddLead from './AddLead.js';
 import UploadCsvLead from 'views/Lead/UploadCsvLead';
+import moment from 'moment/moment';
 
 // ----------------------------------------------------------------------
 
@@ -102,17 +103,6 @@ const Lead = () => {
   const handleOpenAdd = () => setOpenAdd(true);
   const handleCloseAdd = () => setOpenAdd(false);
 
-  const handleOpenEditlead = (data) => {
-    setPropsData(data);
-    setOpenEdit(true);
-    console.log(openEdit);
-  };
-  const handleCloseEditlead = () => setOpenEdit(false);
-  //-----------------------------------------------
-  const handleOpenview = (id) => {
-    navigate(`/dashboard/lead/view/${id}`);
-  };
-
   // ----------------------------------------------------------------------
 
   // function for fetching all the leads data from the db
@@ -120,17 +110,19 @@ const Lead = () => {
   const fetchLeadData = async () => {
     try {
       const response = await getApi(`api/phoneCall/getUploadedLead`);
-      setOutbound(response?.data?.leads);
-      console.log(response.data)
+      const data = response?.data?.leads;
+      const sortedData = [...data].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      setOutbound(sortedData);
+      console.log(response.data);
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
-    fetchLeadData()
-  },[])
-  let count = 0
+    fetchLeadData();
+  }, [openAdd]);
+  let count = 0;
   const columns = [
     {
       field: 'id',
@@ -147,7 +139,7 @@ const Lead = () => {
       cellClassName: 'name-column--cell name-column--cell--capitalize',
       renderCell: (params) => {
         const handleFirstNameClick = () => {
-          navigate(`/dashboard/lead/view/${params?.row._id ? params?.row._id : params?.row.call_id }`);
+          navigate(`/dashboard/lead/view/${params?.row._id ? params?.row._id : params?.row.call_id}`);
         };
 
         return <Box onClick={handleFirstNameClick}>{params?.value ? params?.value : 'No Name'}</Box>;
@@ -163,14 +155,6 @@ const Lead = () => {
       headerName: 'Phone Number',
       flex: 1
     },
-    // {
-    //   field: 'Date',
-    //   headerName: 'Date',
-    //   flex: 1,
-    //   renderCell: (params) => {
-    //     return <Typography style={{ color: 'black' }}>{moment(params?.row?.updatedDate).format('h:mm A DD-MM-YYYY')}</Typography>
-    //   }
-    // },
     {
       field: 'Status',
       headerName: 'Status',
@@ -187,8 +171,16 @@ const Lead = () => {
             style={{ background: '#ede7f6', color: '#5e35b1' }}
           >
             View Status
-           </Button>
+          </Button>
         );
+      }
+    },
+    {
+      field: 'Date',
+      headerName: 'Date',
+      flex: 1,
+      renderCell: (params) => {
+        return <Typography style={{ color: 'black' }}>{moment(params?.row?.created_at).format('h:mm A DD-MM-YYYY')}</Typography>
       }
     },
   ];
@@ -196,7 +188,7 @@ const Lead = () => {
   return (
     <>
       <AddLead open={openAdd} handleClose={handleCloseAdd} />
-      <UploadCsvLead open={OpenUploadCsv} handleClose={handleCloseUploadCsv}/>
+      <UploadCsvLead open={OpenUploadCsv} handleClose={handleCloseUploadCsv} />
       <Container>
         <Stack direction="row" alignItems="center" mb={5} justifyContent={'space-between'}>
           <Typography variant="h4">Outbound-Management</Typography>
@@ -221,7 +213,7 @@ const Lead = () => {
                     rows={OutboundData}
                     columns={columns}
                     checkboxSelection
-                    getRowId={(row) => row?._id ? row?._id : row?.call_id}
+                    getRowId={(row) => (row?._id ? row?._id : row?.call_id)}
                     initialState={{
                       pagination: {
                         paginationModel: { page: 0, pageSize: 10 }
