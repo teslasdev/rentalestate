@@ -146,15 +146,6 @@ const Contact = () => {
   let count = 0;
   const columns = [
     {
-      field: 'id',
-      headerName: '#',
-      flex: 1,
-      cellClassName: 'name-column--cell--capitalize',
-      renderCell: (params) => {
-        return <Box> {(count += 1)}</Box>;
-      }
-    },
-    {
       field: 'title',
       headerName: 'Title',
       flex: 1,

@@ -108,14 +108,6 @@ const Meeting = () => {
 
   const columns = [
     {
-      field: 'id',
-      headerName: '#',
-      flex: 1,
-      renderCell: (params) => {
-        return <Box> {(count += 1)}</Box>;
-      }
-    },
-    {
       field: 'agenda',
       headerName: 'Agenda',
       flex: 1,

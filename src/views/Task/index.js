@@ -157,14 +157,6 @@ const Tasks = () => {
   //-----------------------------------------------
   const columns = [
     {
-      field: 'id',
-      headerName: '#',
-      flex: 1,
-      renderCell: (params) => {
-        return <Box> {(count += 1)}</Box>;
-      }
-    },
-    {
       field: 'title',
       headerName: 'Title',
       flex: 1,

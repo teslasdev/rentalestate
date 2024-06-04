@@ -125,14 +125,6 @@ const Lead = () => {
   let count = 0;
   const columns = [
     {
-      field: 'id',
-      headerName: '#',
-      flex: 1,
-      renderCell: () => {
-        return <Box>{(count += 1)}</Box>;
-      }
-    },
-    {
       field: 'name',
       headerName: 'Name',
       flex: 1,

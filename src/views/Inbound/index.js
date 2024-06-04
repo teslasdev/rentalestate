@@ -27,14 +27,6 @@ const Index = () => {
   let count = 0;
   const columns = [
     {
-      field: 'id',
-      headerName: 'ID',
-      flex: 1,
-      renderCell: () => {
-        return <Box>{(count += 1)}</Box>;
-      }
-    },
-    {
       field: 'Call Id',
       headerName: 'Call Id',
       flex: 1,

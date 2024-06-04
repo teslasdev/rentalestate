@@ -11,8 +11,6 @@ import Typography from '@mui/material/Typography';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useFormik } from 'formik';
 import { postApi } from 'views/services/api';
-import * as yup from 'yup';
-import moment from 'moment';
 import { toast } from 'react-toastify';
 import Palette from '../../ui-component/ThemePalette';
 import { leadSchema } from 'schema';
@@ -34,7 +32,10 @@ const AddLead = (props) => {
       let response = await postApi('api/phoneCall/sigleCallUpload', values);
       if (response.status === 200) {
         formik.resetForm();
+        handleClose();
         toast.success('Outbound added successfully');
+      } else {
+        toast.error(response?.response?.data?.msg);
       }
     } catch (e) {
       console.log(e);
@@ -48,7 +49,7 @@ const AddLead = (props) => {
     onSubmit: async (values) => {
       console.log('hey');
       AddData(values);
-      handleClose();
+     
     }
   });
 
@@ -95,8 +96,7 @@ const AddLead = (props) => {
                   <TextField
                     id="phoneNumber"
                     name="phoneNumber"
-                    type="number"
-                    size="small"
+                    type="text"
                     fullWidth
                     placeholder="Enter Number"
                     value={formik.values.phoneNumber}
