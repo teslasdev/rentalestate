@@ -3,15 +3,17 @@ import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import Iconify from '../../ui-component/iconify';
 import TableStyle from '../../ui-component/TableStyle';
 import { useState } from 'react';
-import { Stack, Button, Container, Typography, Box, Card } from '@mui/material';
+import { Stack, Button, Container, Typography, Box, Card, IconButton } from '@mui/material';
 import * as React from 'react';
 import { styled, alpha } from '@mui/material/styles';
 import Menu from '@mui/material/Menu';
-import { getApi } from 'views/services/api';
+import { deleteApi, getApi, postApi } from 'views/services/api';
 import { useEffect } from 'react';
 import AddLead from './AddLead.js';
 import UploadCsvLead from 'views/Lead/UploadCsvLead';
 import moment from 'moment/moment';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { toast } from 'react-toastify';
 
 // ----------------------------------------------------------------------
 
@@ -61,6 +63,7 @@ const Lead = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [OutboundData, setOutbound] = useState([]);
   const user = JSON.parse(localStorage.getItem('user'));
+  const [selectedRows, setSelectedRows] = useState([]); // State to track selected rows
 
   //-------------------------------------------
   const open = anchorEl;
@@ -123,6 +126,25 @@ const Lead = () => {
     fetchLeadData();
   }, [openAdd]);
   let count = 0;
+  const handleDelete = async (id) => {
+    try {
+      await postApi(`api/phoneCall/deleteLead/${id}`);
+      fetchLeadData(); // Refresh the data after deletion
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // function to handle the delete operation for selected rows
+  const handleDeleteSelected = async () => {
+    try {
+      await Promise.all(selectedRows.map((id) => deleteApi(`api/phoneCall/deleteLead/`, id)));
+      toast.success('Lead(s) Deleted successful');
+      fetchLeadData(); // Refresh the data after deletion
+      setSelectedRows([]); // Clear selected rows
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const columns = [
     {
       field: 'name',
@@ -172,9 +194,9 @@ const Lead = () => {
       headerName: 'Date',
       flex: 1,
       renderCell: (params) => {
-        return <Typography style={{ color: 'black' }}>{moment(params?.row?.created_at).format('h:mm A DD-MM-YYYY')}</Typography>
+        return <Typography style={{ color: 'black' }}>{moment(params?.row?.created_at).format('h:mm A DD-MM-YYYY')}</Typography>;
       }
-    },
+    }
   ];
 
   return (
@@ -190,6 +212,15 @@ const Lead = () => {
             </Button>
             <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenUploadCsv}>
               Upload Csv
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              startIcon={<DeleteIcon />}
+              onClick={handleDeleteSelected}
+              disabled={selectedRows.length === 0} // Disable button if no rows are selected
+            >
+              Delete Selected
             </Button>
           </Stack>
         </Stack>
@@ -211,6 +242,7 @@ const Lead = () => {
                         paginationModel: { page: 0, pageSize: 10 }
                       }
                     }}
+                    onRowSelectionModelChange={(newSelection) => setSelectedRows(newSelection)}
                     slots={{ toolbar: GridToolbar }}
                     pageSizeOptions={[5, 20]}
                     slotProps={{ toolbar: { showQuickFilter: true } }}

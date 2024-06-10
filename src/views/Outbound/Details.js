@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
- 
-  Grid,
-  Typography,
-  Box,
-  Card,
-  CardContent,
-  Container
-} from '@mui/material';
+import { Grid, Typography, Box, Card, CardContent, Container } from '@mui/material';
 import { getApi, postApi } from 'views/services/api';
 import { IconPhone, IconUser } from '@tabler/icons';
 import moment from 'moment';
@@ -31,7 +23,21 @@ function DetailsOutbound() {
     fetchInboundDetails();
   }, []);
 
-
+  const formatCallDuration = (duration) => {
+    duration = Math.round(duration);
+    if (duration < 60) {
+      return `${duration} seconds`;
+    } else if (duration < 3600) {
+      const minutes = Math.floor(duration / 60);
+      const seconds = duration % 60;
+      return `${minutes} minutes ${seconds > 0 ? `${seconds} seconds` : ''}`;
+    } else {
+      const hours = Math.floor(duration / 3600);
+      const minutes = Math.floor((duration % 3600) / 60);
+      const seconds = duration % 60;
+      return `${hours} hours ${minutes > 0 ? `${minutes} minutes` : ''} ${seconds > 0 ? `${seconds} seconds` : ''}`;
+    }
+  };
   return (
     <Grid item xs={12} md={5}>
       <Card>
@@ -79,18 +85,28 @@ function DetailsOutbound() {
                   <Typography style={{ color: 'black' }}>{callData?.email}</Typography>
                 </Box>
 
+                <Box display={'flex'} gap={1} py={2}>
+                  <Typography variant="h5">Property Type:</Typography>
+                  <Typography style={{ color: 'black' }}>{callData?.property_type}</Typography>
+                </Box>
+
+                <Box display={'flex'} gap={1} py={2}>
+                  <Typography variant="h5">Call Duration:</Typography>
+                  <Typography style={{ color: 'black' }}>{formatCallDuration(callData?.call_duration)}</Typography>
+                </Box>
+
                 <Box display={'flex'} alignItems={'center'} gap={1} py={2}>
                   <Typography variant="h5">Call Status:</Typography>
                   <Box
                     sx={
-                      callData?.call_status == 'ended'
+                      callData?.call_status == 'completed'
                         ? {
                             backgroundColor: '#01B574',
                             color: 'white',
                             padding: '4px',
                             borderRadius: '5px'
                           }
-                        : callData?.call_status == 'pending'
+                        : callData?.call_status == 'in progress'
                         ? {
                             backgroundColor: '#ECC94B',
                             color: 'white',
@@ -137,9 +153,68 @@ function DetailsOutbound() {
                   <Typography variant="h5">End Time:</Typography>
                   <Typography style={{ color: 'black' }}>{moment(callData?.end_date).format('h:mm A')}</Typography>
                 </Box>
+
+                <Box display={'flex'} alignItems={'center'} gap={1} py={2}>
+                  <Typography variant="h5">Lead :</Typography>
+                  <Box
+                    sx={
+                      callData?.lead_confirmed == true
+                        ? {
+                            backgroundColor: '#01B574',
+                            color: 'white',
+                            padding: '4px',
+                            borderRadius: '5px'
+                          }
+                        : {
+                            backgroundColor: '#eb7b74',
+                            color: 'white',
+                            padding: '4px',
+                            borderRadius: '5px'
+                          }
+                    }
+                  >
+                    {callData?.lead_confirmed ? (property_type == 'personal' ? 'Lead' : 'Hot Lead') : 'No Lead'}
+                  </Box>
+                </Box>
+
+                <Box display={'flex'} alignItems={'center'} gap={1} py={2}>
+                  <Typography variant="h5">Call Back Later :</Typography>
+                  <Box
+                    sx={
+                      callData?.call_back_later
+                        ? {
+                            backgroundColor: '#01B574',
+                            color: 'white',
+                            padding: '4px',
+                            borderRadius: '5px'
+                          }
+                        : {
+                            backgroundColor: '#eb7b74',
+                            color: 'white',
+                            padding: '4px',
+                            borderRadius: '5px'
+                          }
+                    }
+                  >
+                    {callData?.call_back_later ? 'Yes' : 'No'}
+                  </Box>
+                </Box>
+
+                <Box display={'flex'} flexDirection={'column'} gap={1} py={2}>
+                  <Typography variant="h5">Transcript:</Typography>
+                  {/* {callData.transcript &&
+                    callData?.transcript.map((item, index) => {
+                      return (
+                        <Typography key={index} style={{ color: 'black' }}>
+                          {item.speaker} : {item.message}
+                        </Typography>
+                      );
+                    })} */}
+                    {callData?.transcript}
+                </Box>
                 <Box display={'flex'} flexDirection={'column'} gap={1} py={2}>
                   <Typography variant="h5">Call Summary :</Typography>
-                  <Typography style={{ color: 'black' }}>{callData?.summary ? callData?.summary : 'N/A'}</Typography>
+                  <Typography style={{ color: 'black' }}>{callData?.call_summary ? callData?.call_summary : 'N/A'}</Typography>
                 </Box>
               </Box>
             </Box>
